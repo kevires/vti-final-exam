@@ -1,7 +1,7 @@
 # Create the security group for RDS instance
 resource "aws_security_group" "sg_rds_postgres_instance" {
   vpc_id      = var.vpc_id
-  name        = "SG RDS INSTANCE"
+  name        = "SG RDS INSTANCE KHAINH"
   description = "Allow access to RDS instance from the external network"
   
   # Ingress rule to allow external access (replace with your IP or open to all cautiously)
@@ -24,7 +24,7 @@ resource "aws_security_group" "sg_rds_postgres_instance" {
 
 # Create the DB parameter group
 resource "aws_db_parameter_group" "dbpg_rds_postgres" {
-  name        = "postgres-pg"
+  name        = "postgres-pg-khainh"
   family      = "postgres16"
   description = "postgres16 description"
 }
