@@ -16,7 +16,7 @@ spec:
     spec:
       containers:
       - name: flask-app
-        image: khainh3101/vti-final-exam:latest
+        image: 084375555299.dkr.ecr.ap-southeast-1.amazonaws.com/vti/khainh-repo:latest
         ports:
         - containerPort: 5000  
         env:
