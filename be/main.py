@@ -8,6 +8,7 @@ ssm_client = boto3.client('ssm', region_name='ap-southeast-1')
 
 async def get_ssm_parameter(param_name, with_decryption=True):
     try:
+        print("start get ssm")
         response = ssm_client.get_parameter(
             Name=param_name,
             WithDecryption=with_decryption
@@ -21,13 +22,22 @@ async def fetch_db_info():
     db_name_param = "/rds/db/khainh_db/dbname"
     db_user_param = "/rds/db/khainh_db/superuser/username"
     db_password_param = "/rds/db/khainh_db/superuser/password"
+    db_endpoint_param = "/rds/db/khainh_db/superuser/dbendpoint"
+    db_port_param = "/rds/db/khainh_db/superuser/dbport"
 
     db_name = await get_ssm_parameter(db_name_param)
     db_user = await get_ssm_parameter(db_user_param)
     db_password = await get_ssm_parameter(db_password_param)
+    db_port = await get_ssm_parameter(db_port_param)
+    db_endpoint = await get_ssm_parameter(db_endpoint_param)
 
-    rds_host = 'khainh-postgres-db.cd4se6sg2tw3.ap-southeast-1.rds.amazonaws.com'
-    db_port = '5432'
+    print(db_password)
+    print(db_user)
+    print(db_name)
+
+
+    # rds_host = 'khainh-postgres-db.cd4se6sg2tw3.ap-southeast-1.rds.amazonaws.com'
+    # db_port = '5432'
 
     connection = None
     try:
@@ -35,7 +45,7 @@ async def fetch_db_info():
             user=db_user,
             password=db_password,
             database=db_name,
-            host=rds_host,
+            host=db_endpoint,
             port=db_port
         )
 
@@ -63,3 +73,4 @@ async def info():
 
 if __name__ == "__main__":
     app.run(host='0.0.0.0', port=5000)
+    app
