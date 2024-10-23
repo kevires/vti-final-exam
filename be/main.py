@@ -2,20 +2,24 @@ from flask import Flask, jsonify
 import boto3
 import asyncpg
 import asyncio
+import logging
 
 app = Flask(__name__)
 ssm_client = boto3.client('ssm', region_name='ap-southeast-1')
 
+# Set up logging
+logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
+
 async def get_ssm_parameter(param_name, with_decryption=True):
     try:
-        print("start get ssm")
+        logging.info(f"Starting to get SSM parameter: {param_name}")
         response = ssm_client.get_parameter(
             Name=param_name,
             WithDecryption=with_decryption
         )
         return response['Parameter']['Value']
     except Exception as e:
-        print(f"Error fetching parameter {param_name}: {e}")
+        logging.error(f"Error fetching parameter {param_name}: {e}")
         return None
 
 async def fetch_db_info():
@@ -31,13 +35,7 @@ async def fetch_db_info():
     db_port = await get_ssm_parameter(db_port_param)
     db_endpoint = await get_ssm_parameter(db_endpoint_param)
 
-    print(db_password)
-    print(db_user)
-    print(db_name)
-
-
-    # rds_host = 'khainh-postgres-db.cd4se6sg2tw3.ap-southeast-1.rds.amazonaws.com'
-    # db_port = '5432'
+    logging.info(f"DB credentials fetched - User: {db_user}, Name: {db_name}")
 
     connection = None
     try:
@@ -50,6 +48,7 @@ async def fetch_db_info():
         )
 
         rds_version = await connection.fetchval("SELECT version();")
+        logging.info(f"Connected to RDS. Version: {rds_version}")
         return {
             'db_name': db_name,
             'db_user': db_user,
@@ -57,7 +56,7 @@ async def fetch_db_info():
             'rds_version': rds_version
         }
     except Exception as e:
-        print(f"Error connecting to RDS: {e}")
+        logging.error(f"Error connecting to RDS: {e}")
         return None
     finally:
         if connection:
@@ -69,8 +68,8 @@ async def info():
     if db_info:
         return jsonify(db_info), 200
     else:
+        logging.error("Unable to fetch database info.")
         return jsonify({"error": "Unable to fetch database info"}), 500
 
 if __name__ == "__main__":
     app.run(host='0.0.0.0', port=5000)
-    app
