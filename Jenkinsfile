@@ -31,7 +31,7 @@ pipeline {
                     sh 'docker push 084375555299.dkr.ecr.ap-southeast-1.amazonaws.com/vti/khainh-repo:latest'
                     sh 'aws eks --region ap-southeast-1 update-kubeconfig --name khainheks'
                     sh 'kubectl delete deployment flask-app'
-                    sh 'kubectl apply -f /var/lib/jenkins/workspace/vti-pipeline/tf/deployment.yaml --force --grace-period=0'
+                    sh 'kubectl apply -f /var/lib/jenkins/workspace/vti-pipeline/tf/deployment.yaml'
                 }
             }
         }
