@@ -1,3 +1,4 @@
+import os
 from flask import Flask, jsonify
 import boto3
 import asyncpg
@@ -5,7 +6,14 @@ import asyncio
 import logging
 
 app = Flask(__name__)
-ssm_client = boto3.client('ssm', region_name='ap-southeast-1')
+
+# Configure AWS client using environment variables
+ssm_client = boto3.client(
+    'ssm',
+    region_name='ap-southeast-1',
+    aws_access_key_id=os.getenv("AWS_ACCESS_KEY_ID"),
+    aws_secret_access_key=os.getenv("AWS_SECRET_ACCESS_KEY")
+)
 
 # Set up logging
 logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
@@ -21,7 +29,6 @@ async def get_ssm_parameter(param_name, with_decryption=True):
     except Exception as e:
         logging.error(f"Error fetching parameter {param_name}: {e}")
         return None
-
 async def fetch_db_info():
     db_name_param = "/rds/db/khainh_db/dbname"
     db_user_param = "/rds/db/khainh_db/superuser/username"
